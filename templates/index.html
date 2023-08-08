@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Podcast Promotion</title>
+    <!-- Add any CSS styling and JavaScript libraries you need here -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="mb-4">Podcast Promotion</h1>
+        <form>
+            <div class="mb-3">
+                <label for="transcript" class="form-label">Transcript:</label>
+                <textarea id="transcript" class="form-control" rows="6" placeholder="Enter podcast transcript"></textarea>
+            </div>
+
+            <div class="mb-3">
+                <label for="guest" class="form-label">Guest Name:</label>
+                <input type="text" id="guest" class="form-control" placeholder="Enter guest name">
+            </div>
+
+            <button type="button" class="btn btn-primary" onclick="generatePost()">Generate Social Media Post</button>
+            <button type="button" class="btn btn-secondary" onclick="useSample()">Use Sample</button>
+
+        </form>
+
+        <div class="result mt-5">
+            <h2>Social Media Post:</h2>
+            <p id="socialMediaCopy"></p>
+            <img id="postImage" src="" alt="Generated Post Image">
+
+            <!-- Use Bootstrap spinner for the loading message -->
+            <div id="loadingMessage" class="text-center mt-3">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-2">Generating social media post...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+        function useSample() {
+                    // Set the sample transcript and guest name
+                    document.getElementById("transcript").value = "MIRA MURATI: We’re working on something that will change everything. Will change the way that we work, the way that we interact with each other, and the way that we think and everything, really, all aspects of life.\n\nKEVIN SCOTT: Hi, everyone. Welcome to Behind the Tech. I’m your host, Kevin Scott, Chief Technology Officer for Microsoft.\n\nIn this podcast, we’re going to get behind the tech. We’ll talk with some of the people who have made our modern tech world possible and understand what motivated them to create what they did. So, join me to maybe learn a little bit about the history of computing and get a few behind-the-scenes insights into what’s happening today. Stick around.\n\nKEVIN SCOTT: Today we have a super exciting guest with us, Mira Murati. I've had the pleasure of working very closely with Mira and her team at OpenAI for the last several years. And even though I've had all of these opportunities to interact with her, it was so interesting to hear more about her story, like how she grew up, how she first became interested in mathematics and then physics and science and where this intense curiosity that she had from childhood eventually led her. And I think there were just some amazing nuggets in our conversation. Can't wait to dive right in. So let's get at it.\n\nKEVIN SCOTT: Mira Murati is the CTO of OpenAI. She worked as an engineer and product manager, most notably helping to develop the Tesla Model X. She joined OpenAI in 2018 as the VP of applied AI and partnerships and has since been promoted to CTO. During that time, she’s helped bring AI products like ChatGPT, DALL-E, and GPT-4 public and has partnered closely with our team at Microsoft to integrate their technology into our products. It is so awesome to have you on the show today, Mira. Thank you so much for joining us.\n\nMIRA MURATI: Thank you, Kevin. Excited to be here.\n\nKEVIN SCOTT: Yes, so I actually -- I’m going to learn a lot about you today that I don’t know, which I’m super stoked about. I would love to understand how you got interested in science and technology in the first place.\n\nMIRA MURATI: It started with math. When I was a kid, I just gravitated toward math. I would do problem sets all the time and then eventually did Olympiads and I loved doing that. It was such a passion.";
+                    document.getElementById("guest").value = "Mira Murati";
+                }
+                
+        function generatePost() {
+            const transcript = document.getElementById("transcript").value;
+            const guest = document.getElementById("guest").value;
+    
+            // Show loading message and spinner
+            const loadingMessage = document.getElementById("loadingMessage");
+            loadingMessage.style.display = "block";
+            document.getElementById("socialMediaCopy").innerText = "";
+            document.getElementById("postImage").src = "";
+    
+            // Make a POST request to your API endpoint to generate the social media post
+            // Update the API URL accordingly
+            const apiUrl = "/generate_social_media_post";
+            const data = {
+                "transcript": transcript,
+                "guest": guest
+            };
+    
+            fetch(apiUrl, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(result => {
+                // Update the UI with the generated social media post and image
+                document.getElementById("socialMediaCopy").innerText = result.social_media_copy;
+                document.getElementById("postImage").src = result.image_url;
+    
+                // Hide loading message when request is complete
+                loadingMessage.style.display = "none";
+            })
+            .catch(error => {
+                console.error("Error generating social media post:", error);
+    
+                // Hide loading message and display an error message when there's an error
+                loadingMessage.style.display = "none";
+                document.getElementById("socialMediaCopy").innerText = "Error generating social media post.";
+                document.getElementById("postImage").src = "";
+            });
+        }
+    </script>
+</body>
+</html>

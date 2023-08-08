@@ -1,0 +1,12 @@
+torch
+transformers
+optimum
+onnx
+openai-whisper
+langchain
+pydub
+openai
+ffmpeg-python
+Image
+flask
+gunicorn
