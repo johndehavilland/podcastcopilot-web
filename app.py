@@ -1,5 +1,7 @@
 from flask import Flask, request, jsonify, render_template
 
+import os
+
 import requests
 
 from langchain.chains import TransformChain, LLMChain, SequentialChain
@@ -22,12 +24,28 @@ import openai
 
 app = Flask(__name__)
 
+# If RUNNING_IN_PRODUCTION is defined as an environment variable, then we're running on Azure
+if not 'RUNNING_IN_PRODUCTION' in os.environ:
+   # Local development, where we'll use environment variables.
+   print("Loading config.development and environment variables from .env file.")
+   app.config.from_object('azureproject.development')
+else:
+   # Production, we don't load environment variables from .env file but add them as environment variables in Azure.
+   print("Loading config.production.")
+   app.config.from_object('azureproject.production')
+
+with app.app_context():
+    app.config.update(
+        SQLALCHEMY_DATABASE_URI=app.config.get('DATABASE_URI'),
+        SQLALCHEMY_TRACK_MODIFICATIONS=False,
+    )
+
 # Endpoint Settings
 bing_search_url = "https://api.bing.microsoft.com/v7.0/search"
-bing_subscription_key = ""
+bing_subscription_key = os.environ['BING_SUBSCRIPTION_KEY']
 openai_api_type = "azure"
-openai_api_base = "https://<nameofservice>.openai.azure.com/"
-openai_api_key = ""
+openai_api_base = os.environ['OPENAI_API_BASE']
+openai_api_key = os.environ['OPENAI_API_KEY']
 gpt4_deployment_name = "gpt35"
 
 # We are assuming that you have all model deployments on the same Azure OpenAI service resource above.  If not, you can change these settings below to point to different resources.
