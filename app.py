@@ -4,6 +4,8 @@ import os
 
 import requests
 
+from dotenv import load_dotenv
+
 from langchain.chains import TransformChain, LLMChain, SequentialChain
 from langchain.chat_models import AzureChatOpenAI
 
@@ -24,21 +26,7 @@ import openai
 
 app = Flask(__name__)
 
-# If RUNNING_IN_PRODUCTION is defined as an environment variable, then we're running on Azure
-if not 'RUNNING_IN_PRODUCTION' in os.environ:
-   # Local development, where we'll use environment variables.
-   print("Loading config.development and environment variables from .env file.")
-   app.config.from_object('azureproject.development')
-else:
-   # Production, we don't load environment variables from .env file but add them as environment variables in Azure.
-   print("Loading config.production.")
-   app.config.from_object('azureproject.production')
-
-with app.app_context():
-    app.config.update(
-        SQLALCHEMY_DATABASE_URI=app.config.get('DATABASE_URI'),
-        SQLALCHEMY_TRACK_MODIFICATIONS=False,
-    )
+load_dotenv('.env')
 
 # Endpoint Settings
 bing_search_url = "https://api.bing.microsoft.com/v7.0/search"
